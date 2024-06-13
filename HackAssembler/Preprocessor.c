@@ -120,6 +120,7 @@ void populateTable (SymbolTable *symbolTable)
 	symbolTable->symbols[22].addr = 4;
 	
 	symbolTable->nextSymbol += 23;
+	symbolTable->nextAddr += 23;
 }
 
 void addSymbol (SymbolTable **symbolTable, char* name, int len, int addr)
@@ -155,4 +156,74 @@ void addSymbol (SymbolTable **symbolTable, char* name, int len, int addr)
 		
 		(*symbolTable)->nextSymbol++;
 	}
+}
+
+/******************************************************************************
+Function: lookupTable
+
+Summary:  looks up a symbol name in the table, returns -1 if it does not exist
+*******************************************************************************
+Pseudocode:
+
+Begin
+	Set address to -1
+	
+	Loop through symbolTable
+		If symbol name matches name then
+			Set address to symbol address
+		End if
+	End loop
+	
+	Return address
+End
+
+******************************************************************************/
+
+int lookupTable (SymbolTable *symbolTable, char* name)
+{
+	int i, addr;
+	
+	addr = -1;
+	
+	for (i = 0; i < symbolTable->nextSymbol; i++)
+	{
+		if (strcmp( symbolTable->symbols[i].name, name ) == 0)
+		{
+			addr = symbolTable->symbols[i].addr;
+		}
+	}
+	
+	return addr;
+}
+
+/******************************************************************************
+Function: lookupTable
+
+Summary:  gets the address from a symbol in the symbol table, adds a new symbol
+	if it does not exits
+*******************************************************************************
+Pseudocode:
+
+Begin
+	Loop through 
+End
+
+******************************************************************************/
+
+int getAddress (SymbolTable *symbolTable, char* name)
+{
+	int addr;
+	
+	addr = lookupTable(symbolTable, name);
+	
+	if (addr < 0) // If address does not exist in table already
+	{
+		addr = symbolTable->nextAddr;
+		
+		addSymbol(&symbolTable, name, sizeof(name), symbolTable->nextAddr);
+		
+		symbolTable->nextAddr++;
+	}
+	
+	return addr;
 }

@@ -1,37 +1,14 @@
-/*
-Hack Assembly assembler
-
-Take in a .asm file and convert it to a .txt file containing the instructions in
-1s an 0s, one instruction per line
-
-Create symbol table
-	Initiated with predefined symbols
-	
-	1st read adds all labels in program
-	
-	2nd read converts all symbols in program into corresponding values
-	
-	
-	
-	Symbol table:
-		Dynamically allocated array of structs
-			Struct will contain a pointer to string (symbol) and another pointer
-			to a string (defintion)
-	
-
-*/
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "Parser.h"
 #include "Preprocessor.h"
+#include "Parser.h"
 
-#undef DEBUG_FORMATTER
+#define DEBUG_FORMATTER
 #define DEBUG_PREPROCESSOR
 
-char* format(char *str);
+void formatInst(char *oldStr, char *newStr);
 
 /******************************************************************************
 Function: main
@@ -44,6 +21,9 @@ Begin
 	Verify commandline argument
 	
 	Open .asm file
+	
+	Allocate symbol table
+	Preprocess asm file
 	
 	Loop while get instruction != null
 		Remove leading whitespace
@@ -63,14 +43,6 @@ int main (int argc, char **argv)
 	
 	unsigned int lineNumber = 1;
 	int tableSize = DEFAULT_TABLE_SIZE;
-	
-	printf("%u\n", sizeof(SymbolTable) + tableSize * sizeof(Symbol));
-	
-	// I use the struct hack to include dynamic memory array (symbols) in SymbolTable struct
-	SymbolTable *symbolTable = (SymbolTable *) malloc (sizeof(SymbolTable) + tableSize * sizeof(Symbol)); 
-	
-	symbolTable->tableSize = tableSize;
-	symbolTable->nextSymbol = 0;
 	
 	if (argc < 2)
 	{
@@ -92,42 +64,51 @@ int main (int argc, char **argv)
 		return 1;
 	}
 	
-	preprocess(asmFile, symbolTable);
+	// I use the struct hack to include dynamic memory array (symbols) in SymbolTable struct
+	SymbolTable *symbolTable = (SymbolTable *) malloc (sizeof(SymbolTable) + tableSize * sizeof(Symbol)); 
 	
-	#ifdef DEBUG_PREPROCESSOR
-		for (int i = 0; i < symbolTable->nextSymbol; i++)
-		{
-			printf("%s - %d - %u\n", symbolTable->symbols[i].name, symbolTable->symbols[i].addr, (unsigned long int)(symbolTable->symbols+i)/36);
-		}
-		printf("\n");
-	#endif
+	symbolTable->tableSize = tableSize;
+	symbolTable->nextSymbol = 0;
+	symbolTable->nextAddr = 0;
+	
+	preprocess(asmFile, symbolTable);
 
 	rewind(asmFile);
 	while (fgets(instruction, MAX_LINE_LEN + 2, asmFile) != NULL)
 	{
-		formattedInst = format(instruction);
+		formatInst(instruction, formattedInst);
 		
-		if (formattedInst[0] != '\0')
+		if (formattedInst[0] != '\0' && formattedInst[0] != '(')
 		{
 			
 			#ifdef DEBUG_FORMATTER
 				puts(formattedInst);
 			#endif
 			
-			/*if (formattedInst[0] == '@')
+			if (formattedInst[0] == '@')
 			{
-				binaryInst = ainst(formattedInst);
+				binaryInst = ainst(formattedInst, symbolTable);
 			}
 			else
 			{
-				binaryInst = cinst(formattedInst, lineNumber);
+				binaryInst = cinst(formattedInst, lineNumber); // Line number included for printing errors
 			}
 			
-			fprintf(outputFile, "%s\n", binaryInst);*/
+			fprintf(outputFile, "%s\n", binaryInst);
 		}
 		
 		lineNumber++;
 	}
+	
+	#ifdef DEBUG_PREPROCESSOR
+		printf("\nSymbols:\n");
+		
+		for (int i = 0; i < symbolTable->nextSymbol; i++)
+		{
+			printf("%s - %d\n", symbolTable->symbols[i].name, symbolTable->symbols[i].addr);
+		}
+		printf("\n");
+	#endif
 	
 	free(symbolTable);
 	
@@ -135,7 +116,7 @@ int main (int argc, char **argv)
 }
 
 /******************************************************************************
-Function: format
+Function: formatInst
 
 Summary:  processes assembly file before any parsing is done, removing 
 	comments and whitespace before or after instructions. 
@@ -143,23 +124,26 @@ Summary:  processes assembly file before any parsing is done, removing
 	returned as empty strings
 ******************************************************************************/
 
-char* format(char *oldStr)
+void formatInst(char *oldStr, char *newStr)
 {
-	char *newStr;
+	char *p = oldStr;
+	char *q = newStr;
 	
-    int i, j;
-	
-    for (i = 0, j = 0; oldStr[i] != '\0' && oldStr[i] != '\n' && (oldStr[i] != '/' && oldStr[i+1] != '/'); i++, j++)
-    {
-		while (oldStr[i] == ' ' || oldStr[i] == '\t')   // Skip over whitespace
+	while (*p != '\0')
+	{
+		
+		while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')
 		{
-			i++;
+			p++;
 		}
 		
-		newStr[j] = oldStr[i];
-    }
+		if (*p == '/' && *(p+1) == '/')
+		{
+			break;
+		}
+		
+		*q++ = *p++;
+	}
 	
-    newStr[j-1] = '\0';
-	
-	return newStr;
+	*q = '\0';
 }

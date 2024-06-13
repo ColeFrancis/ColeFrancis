@@ -4,7 +4,7 @@ HackAssembler: HackAssembler.o Parser.o InstructionTables.o Preprocessor.o
 HackAssembler.o: HackAssembler.c Parser.h Preprocessor.h
 	gcc -c HackAssembler.c
 	
-Parser.o: Parser.c Parser.h InstructionTables.h
+Parser.o: Parser.c Parser.h InstructionTables.h Preprocessor.h
 	gcc -c Parser.c
 	
 InstructionTables.o: InstructionTables.c InstructionTables.h
