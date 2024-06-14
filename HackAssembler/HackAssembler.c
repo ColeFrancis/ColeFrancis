@@ -5,8 +5,8 @@
 #include "Preprocessor.h"
 #include "Parser.h"
 
-#define DEBUG_FORMATTER
-#define DEBUG_PREPROCESSOR
+#undef DEBUG_FORMATTER
+#undef DEBUG_PREPROCESSOR
 
 void formatInst(char *oldStr, char *newStr);
 
@@ -38,7 +38,7 @@ int main (int argc, char **argv)
 {
 	FILE *asmFile, *outputFile;
 	char instruction[MAX_LINE_LEN + 1];
-	char *formattedInst;
+	char formattedInst[MAX_LINE_LEN + 1];
 	char *binaryInst;
 	
 	unsigned int lineNumber = 1;
@@ -76,6 +76,7 @@ int main (int argc, char **argv)
 	rewind(asmFile);
 	while (fgets(instruction, MAX_LINE_LEN + 2, asmFile) != NULL)
 	{
+
 		formatInst(instruction, formattedInst);
 		
 		if (formattedInst[0] != '\0' && formattedInst[0] != '(')
@@ -94,13 +95,15 @@ int main (int argc, char **argv)
 				binaryInst = cinst(formattedInst, lineNumber); // Line number included for printing errors
 			}
 			
-			fprintf(outputFile, "%s\n", binaryInst);
+			fprintf(outputFile, "%.16s\n", binaryInst);																	// FIX: I must include .16 because ainst will incorrectly add a space to the end
+			
+			//free (binaryInst);
 		}
 		
 		lineNumber++;
 	}
-	
-	#ifdef DEBUG_PREPROCESSOR
+
+	#ifdef DEBUG_PREPROCESSOR                                                                                           // FIX: unddefining DEBUG_PREPROCESSOR causes errors for some unknow reason
 		printf("\nSymbols:\n");
 		
 		for (int i = 0; i < symbolTable->nextSymbol; i++)
@@ -109,7 +112,7 @@ int main (int argc, char **argv)
 		}
 		printf("\n");
 	#endif
-	
+
 	free(symbolTable);
 	
 	return 1;
@@ -144,6 +147,6 @@ void formatInst(char *oldStr, char *newStr)
 		
 		*q++ = *p++;
 	}
-	
+
 	*q = '\0';
 }

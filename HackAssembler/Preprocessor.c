@@ -47,7 +47,7 @@ void preprocess (FILE *asmFile, SymbolTable *symbolTable)
 			symbolStart++;
 		}
 		
-		if (instruction[symbolStart] != '/' && instruction[symbolStart] != '(' && instruction[symbolStart + 1] != '\n') // Third condition used for blank lines
+		if (instruction[symbolStart] != '/' && instruction[symbolStart] != '(' && instruction[symbolStart + 1] != '\n' && instruction[symbolStart] != '\0') // Third condition used for blank lines
 		{
 			lineNumber++;
 		}
@@ -120,14 +120,14 @@ void populateTable (SymbolTable *symbolTable)
 	symbolTable->symbols[22].addr = 4;
 	
 	symbolTable->nextSymbol += 23;
-	symbolTable->nextAddr += 23;
+	symbolTable->nextAddr += 16;
 }
 
 void addSymbol (SymbolTable **symbolTable, char* name, int len, int addr)
 {
 	unsigned int newSize;
 	
-	if ((*symbolTable)->nextSymbol >= (*symbolTable)->tableSize)
+	if ((*symbolTable)->nextSymbol >= (*symbolTable)->tableSize)														// FIX: The resizing does not work
     {
         newSize = (*symbolTable)->tableSize * 2;
 		
@@ -144,18 +144,17 @@ void addSymbol (SymbolTable **symbolTable, char* name, int len, int addr)
         *symbolTable = newTable;
         (*symbolTable)->tableSize = newSize;
     }
-	else {
-		if (len >= MAX_SYMBOL_LEN) 
-		{
-			len = MAX_SYMBOL_LEN - 1;
-		}
-		strncpy((*symbolTable)->symbols[(*symbolTable)->nextSymbol].name, name, len);
-		(*symbolTable)->symbols[(*symbolTable)->nextSymbol].name[len] = '\0';
-		
-		(*symbolTable)->symbols[(*symbolTable)->nextSymbol].addr = addr;
-		
-		(*symbolTable)->nextSymbol++;
+	
+	if (len >= MAX_SYMBOL_LEN) 
+	{
+		len = MAX_SYMBOL_LEN - 1;
 	}
+	strncpy((*symbolTable)->symbols[(*symbolTable)->nextSymbol].name, name, len);
+	(*symbolTable)->symbols[(*symbolTable)->nextSymbol].name[len] = '\0';
+	
+	(*symbolTable)->symbols[(*symbolTable)->nextSymbol].addr = addr;
+	
+	(*symbolTable)->nextSymbol++;
 }
 
 /******************************************************************************
