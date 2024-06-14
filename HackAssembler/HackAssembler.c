@@ -41,7 +41,7 @@ int main (int argc, char **argv)
 	char formattedInst[MAX_LINE_LEN + 1];
 	char *binaryInst;
 	
-	unsigned int lineNumber = 1;
+	unsigned int lineNumber = 0;
 	int tableSize = DEFAULT_TABLE_SIZE;
 	
 	if (argc < 2)
@@ -71,7 +71,7 @@ int main (int argc, char **argv)
 	symbolTable->nextSymbol = 0;
 	symbolTable->nextAddr = 0;
 	
-	preprocess(asmFile, symbolTable);
+	preprocess(asmFile, &symbolTable);
 
 	rewind(asmFile);
 	while (fgets(instruction, MAX_LINE_LEN + 2, asmFile) != NULL)
@@ -85,25 +85,24 @@ int main (int argc, char **argv)
 			#ifdef DEBUG_FORMATTER
 				puts(formattedInst);
 			#endif
-			
+	
 			if (formattedInst[0] == '@')
 			{
 				binaryInst = ainst(formattedInst, symbolTable);
 			}
 			else
 			{
-				binaryInst = cinst(formattedInst, lineNumber); // Line number included for printing errors
+				// Line number is included for printing errors (InstructionTables.c)
+				binaryInst = cinst(formattedInst, lineNumber);
 			}
 			
-			fprintf(outputFile, "%.16s\n", binaryInst);																	// FIX: I must include .16 because ainst will incorrectly add a space to the end
-			
-			//free (binaryInst);
+			fprintf(outputFile, "%s\n", binaryInst);
 		}
 		
 		lineNumber++;
 	}
 
-	#ifdef DEBUG_PREPROCESSOR                                                                                           // FIX: unddefining DEBUG_PREPROCESSOR causes errors for some unknow reason
+	#ifdef DEBUG_PREPROCESSOR
 		printf("\nSymbols:\n");
 		
 		for (int i = 0; i < symbolTable->nextSymbol; i++)
@@ -114,6 +113,9 @@ int main (int argc, char **argv)
 	#endif
 
 	free(symbolTable);
+	
+	fclose(asmFile);
+	fclose(outputFile);
 	
 	return 1;
 }

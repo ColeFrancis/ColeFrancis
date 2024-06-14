@@ -28,13 +28,13 @@ End
 
 ******************************************************************************/
 
-void preprocess (FILE *asmFile, SymbolTable *symbolTable)
+void preprocess (FILE *asmFile, SymbolTable **symbolTable)
 {
 	unsigned int lineNumber;
 	char instruction[MAX_LINE_LEN + 1];
 	int symbolStart, symbolLen;
 	
-	populateTable(symbolTable);
+	populateTable(*symbolTable);
 
 	lineNumber = 0;
 	
@@ -46,8 +46,8 @@ void preprocess (FILE *asmFile, SymbolTable *symbolTable)
 		{
 			symbolStart++;
 		}
-		
-		if (instruction[symbolStart] != '/' && instruction[symbolStart] != '(' && instruction[symbolStart + 1] != '\n' && instruction[symbolStart] != '\0') // Third condition used for blank lines
+		// Third condition used for blank lines
+		if (instruction[symbolStart] != '/' && instruction[symbolStart] != '(' && instruction[symbolStart + 1] != '\n' && instruction[symbolStart] != '\0')
 		{
 			lineNumber++;
 		}
@@ -62,7 +62,7 @@ void preprocess (FILE *asmFile, SymbolTable *symbolTable)
 				symbolLen++;
 			}
 			
-			addSymbol(&symbolTable, instruction+symbolStart, symbolLen, lineNumber);
+			addSymbol(symbolTable, instruction+symbolStart, symbolLen, lineNumber);
 		}
 	}
 }
@@ -127,11 +127,9 @@ void addSymbol (SymbolTable **symbolTable, char* name, int len, int addr)
 {
 	unsigned int newSize;
 	
-	if ((*symbolTable)->nextSymbol >= (*symbolTable)->tableSize)														// FIX: The resizing does not work
+	if ( (*symbolTable)->nextSymbol >= (*symbolTable)->tableSize )
     {
         newSize = (*symbolTable)->tableSize * 2;
-		
-		printf("%u\n", sizeof(SymbolTable) + newSize * sizeof(Symbol));
 		
         SymbolTable *newTable = (SymbolTable *) realloc(*symbolTable, sizeof(SymbolTable) + newSize * sizeof(Symbol));
         
@@ -218,8 +216,8 @@ int getAddress (SymbolTable *symbolTable, char* name)
 	if (addr < 0) // If address does not exist in table already
 	{
 		addr = symbolTable->nextAddr;
-		
-		addSymbol(&symbolTable, name, sizeof(name), symbolTable->nextAddr);
+	
+		addSymbol(&symbolTable, name, strlen(name), symbolTable->nextAddr);
 		
 		symbolTable->nextAddr++;
 	}

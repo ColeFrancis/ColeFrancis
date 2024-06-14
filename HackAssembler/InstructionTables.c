@@ -39,7 +39,7 @@ char* destTable(char* dest, unsigned int lineNumber)
 	}
 	else
 	{
-		fprintf(stderr, "Error, syntax error on line %d: %s\n", lineNumber, dest);
+		fprintf(stderr, "Error (Dest), syntax error on line %d: %s\n", lineNumber, dest);
 		exit(1);
 	}
 }
@@ -120,7 +120,7 @@ char* compTable(char* comp, unsigned int lineNumber)
 	}
 	else 
 	{
-		fprintf(stderr, "Error, syntax error on line %d: %s\n", lineNumber, comp);
+		fprintf(stderr, "Error (Comp), syntax error on line %d: %s\n", lineNumber, comp);
 		exit(1);
 	}
 }
@@ -161,7 +161,7 @@ char* jumpTable(char* jump, unsigned int lineNumber)
 	}
 	else
 	{
-		fprintf(stderr, "Error, syntax error on line %d: %s\n", lineNumber, jump);
+		fprintf(stderr, "Error (Jump), syntax error on line %d: %s\n", lineNumber, jump);
 		exit(1);
 	}
 }
