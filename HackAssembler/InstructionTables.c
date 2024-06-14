@@ -17,7 +17,8 @@ char* destTable(char* dest, unsigned int lineNumber)
 	{
 		return "010";
 	}
-	else if (strcmp(dest, "MD") == 0)
+	else if (strcmp(dest, "MD") == 0 || 
+			 strcmp(dest, "DM") == 0)
 	{
 		return "011";
 	}
@@ -25,15 +26,22 @@ char* destTable(char* dest, unsigned int lineNumber)
 	{
 		return "100";
 	}
-	else if (strcmp(dest, "AM") == 0)
+	else if (strcmp(dest, "AM") == 0 || 
+		     strcmp(dest, "MA") == 0)
 	{
 		return "101";
 	}
-	else if (strcmp(dest, "AD") == 0)
+	else if (strcmp(dest, "AD") == 0 || 
+	         strcmp(dest, "DA") == 0)
 	{
 		return "110";
 	}
-	else if (strcmp(dest, "AMD") == 0)
+	else if (strcmp(dest, "AMD") == 0 || 
+			 strcmp(dest, "ADM") == 0 || 
+			 strcmp(dest, "MAD") == 0 || 
+			 strcmp(dest, "MDA") == 0 || 
+			 strcmp(dest, "DAM") == 0 || 
+			 strcmp(dest, "DMA") == 0)
 	{
 		return "111";
 	}
@@ -98,7 +106,8 @@ char* compTable(char* comp, unsigned int lineNumber)
 	{
 		return "110010";
 	}
-	else if (strcmp(comp, "D+A") == 0 || strcmp(comp, "D+M") == 0)
+	else if (strcmp(comp, "D+A") == 0 || strcmp(comp, "D+M") == 0 || 
+			 strcmp(comp, "A+D") == 0 || strcmp(comp, "M+D") == 0)
 	{
 		return "000010";
 	}
@@ -110,11 +119,13 @@ char* compTable(char* comp, unsigned int lineNumber)
 	{
 		return "000111";
 	}
-	else if (strcmp(comp, "D&A") == 0 || strcmp(comp, "D&M") == 0)
+	else if (strcmp(comp, "D&A") == 0 || strcmp(comp, "D&M") == 0 || 
+			 strcmp(comp, "A&D") == 0 || strcmp(comp, "M&D") == 0)
 	{
 		return "000000";
 	}
-	else if (strcmp(comp, "D|A") == 0 || strcmp(comp, "D|M") == 0)
+	else if (strcmp(comp, "D|A") == 0 || strcmp(comp, "D|M") == 0 || 
+			 strcmp(comp, "A|D") == 0 || strcmp(comp, "M|D") == 0)
 	{
 		return "010101";
 	}

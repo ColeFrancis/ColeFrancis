@@ -2,6 +2,8 @@
 
 This was made as part of a project for the Nand to Tetris course, where one learns to design and build their own microprocessor using HDL and simulations.
 
+All c source files, a makefile, and an example assembly code file named Mult.asm are included in this repository
+
 ## Use
 
 Compile the code using the makefile or simply by hand
