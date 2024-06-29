@@ -67,6 +67,14 @@ void preprocess (FILE *asmFile, SymbolTable **symbolTable)
 	}
 }
 
+/*****************************************************************
+Function: populateTable
+
+Summery: adds all predefined symbols into the symbol table, then sets
+	the next label address value and next symbol pointer
+ 
+*****************************************************************/
+
 void populateTable (SymbolTable *symbolTable)
 {
 	strcpy(symbolTable->symbols[0].name, "R0");
@@ -122,6 +130,32 @@ void populateTable (SymbolTable *symbolTable)
 	symbolTable->nextSymbol += 23;
 	symbolTable->nextAddr += 16;
 }
+
+/*****************************************************************
+Function: addSymbol
+
+Summery: inserts a new symbol into the symbol table. If the max size
+	of the symbol table has already been reached, the existing
+	symbol table is reallocated to twice the size
+
+Pseudocode:
+
+Begin
+	If the next symbol > table size then
+		Determine new size of table
+
+		Reallocate table to new table of new size
+		If new table fails to allocate then
+			Return error
+		End if
+
+		Set old table pointer to new table
+	End if
+
+	Add name and address into the symbol table
+End
+
+*****************************************************************/
 
 void addSymbol (SymbolTable **symbolTable, char* name, int len, int addr)
 {

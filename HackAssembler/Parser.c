@@ -8,6 +8,15 @@
 #include "Parser.h"
 #include "InstructionTables.h"
 
+/*****************************************************************
+Function: cInst
+
+Summery: assembles all c instructions
+
+	111accccccdddjjj
+
+*****************************************************************/
+
 char* cinst(char* oldInst, unsigned int lineNumber)
 {
 	char* newInst = (char *) malloc(BINARY_INST_SIZE + 1);
@@ -35,6 +44,15 @@ char* cinst(char* oldInst, unsigned int lineNumber)
 	
 	return newInst;
 }
+
+/*****************************************************************
+Function: parse
+
+Summery: parses all c instructions into 3 parts: destination, computation, and jump
+
+	dest=comp;jump
+
+*****************************************************************/
 
 char parse(char* inst, char* dest, char* comp, char* jump)
 {
@@ -90,6 +108,15 @@ char parse(char* inst, char* dest, char* comp, char* jump)
 	return a;
 }
 
+/*****************************************************************
+Function: containsDest
+
+Summery: Returns a 1 if a provided c instruction contains a destination
+	and a 0 if it does not. A destination is only present when a
+	= character is
+
+*****************************************************************/
+
 int containsDest(char* str)
 {
 	int i;
@@ -104,6 +131,15 @@ int containsDest(char* str)
 	
 	return 0;
 }
+
+/*****************************************************************
+Function: ainst
+
+Summery: assembles all a instructions
+
+	0aaaaaaaaaaaaaaa
+
+*****************************************************************/
 
 char* ainst(char* oldInst, SymbolTable *symbolTable)
 {
@@ -127,6 +163,14 @@ char* ainst(char* oldInst, SymbolTable *symbolTable)
 	
 	return newInst;
 }
+
+/*****************************************************************
+Function: decToBinary
+
+Summery: converts a given string of numbers str into its decimal 
+	value returned as a string of 1s and 0s
+
+*****************************************************************/
 
 void decToBinary(int n, char* str)
 {

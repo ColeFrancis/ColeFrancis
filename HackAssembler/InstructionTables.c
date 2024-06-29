@@ -3,6 +3,13 @@
 #include <string.h>
 #include "InstructionTables.h"
 
+/*****************************************************************
+Function: destTable
+
+Summery: provide a binary value for lookup during parsing of instructions
+ 
+*****************************************************************/
+
 char* destTable(char* dest, unsigned int lineNumber)
 {
 	if (dest[0] == '\0')
@@ -51,6 +58,13 @@ char* destTable(char* dest, unsigned int lineNumber)
 		exit(1);
 	}
 }
+
+/*****************************************************************
+Function: compTable
+
+Summery: provide a binary value for lookup during parsing of instructions
+
+*****************************************************************/
 
 char* compTable(char* comp, unsigned int lineNumber)
 {
@@ -135,6 +149,13 @@ char* compTable(char* comp, unsigned int lineNumber)
 		exit(1);
 	}
 }
+
+/*****************************************************************
+Function: jumpTable
+
+Summery: provide a binary value for lookup during parsing of instructions
+
+*****************************************************************/
 
 char* jumpTable(char* jump, unsigned int lineNumber)
 {
