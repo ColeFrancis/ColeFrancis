@@ -1,0 +1,16 @@
+Problems to solve:
+
+Load ROM into memory
+	Solved!
+
+Record user input
+	Use SDL (see lazy foo tutorial)
+
+Draw to screen
+	Print in terminal
+
+Sprites
+	
+
+The emulator itself
+	Use a struct for the virtual machine itself	
