@@ -20,48 +20,42 @@
  * Begin
  * 	Clear the current screen
  *
- *	Loop through each row of the screen
- *		Loop screen width / 8 times
- *			Loop through each bit of byte pointed to by display buffer
- *				Print XX or space
- *			End loop
- *
- *			Increment display buffer pointer
+ *	Loop through disp array
+ *		Loop through each bit of current int
+ *			print state to pixel
  *		End loop
- *		Print new line
+ *		If then
+ *			Print newline every (width / int_size) time
+ *		End if
  *	End loop
  * End
  */
 
-void refresh_screen(unsigned char* disp)
+void refresh_screen(unsigned char* disp, unsigned int int_size, unsigned int width, unsigned int height)
 {
-	int i, j, k;
-	unsigned char c;
-        unsigned char *p;
-
-        //system("clear"); // system("cls"); for windows. Find out how to let it change
-
-        p = disp;
-        for (i = 0; i < SCREEN_HEIGHT; i++)
-        {
-                for (j = 0; j < SCREEN_WIDTH / 8; j++)
+    //system("clear"); // system("cls"); for windows. Find out how to let it change
+	
+	int i, j;
+	unsigned char* p;
+	
+	for (i = 1, p = disp; p < disp + (width * height / 8); i++, p++)
+	{
+		for (int j = 7; j >= 0; j--)
 		{
-			c = *p;
-
-			for (k = 0; k < 8; k++)
+			if (((*p) >> j) & 1)
 			{
-				if ((c & 0xF0) == 0xF0)
-				{
-					printf("XX");
-				}
-				else
-				{
-				printf("  ");
-				}
-				c << 1;	
+				printf("XX");
 			}
-
-			p++;
+			else
+			{
+				printf("  ");
+			}
+		}
+		
+		if (i == (width / int_size))
+		{
+			printf("\n");
+			i = 0;
 		}
 	}
 }

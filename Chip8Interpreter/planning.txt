@@ -4,10 +4,11 @@ Load ROM into memory
 	Solved!
 
 Record user input
-	Use SDL (see lazy foo tutorial)
+	?
 
 Draw to screen
 	Print in terminal
+	Solved!
 
 Sprites
 	

@@ -1,9 +1,6 @@
 #ifndef IO_H
 #define IO_H
 
-#define SCREEN_WIDTH 64
-#define SCREEN_HEIGHT 32
-
-void refresh_screen(unsigned char* disp);
+void refresh_screen(unsigned char* disp, unsigned int int_size, unsigned int width, unsigned int height);
 
 #endif
