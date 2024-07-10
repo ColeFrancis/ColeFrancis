@@ -13,31 +13,19 @@
 /* 
  * Function: refresh_screen
  *
- * Summary: When called, reads the contents of the display buffer and rerenders the screen
+ * Summary: When called, reads the contents of the display buffer and rerenders the screen, byte by byte (or bit by bit)
  *
- * Pseudocode:
- *
- * Begin
- * 	Clear the current screen
- *
- *	Loop through disp array
- *		Loop through each bit of current int
- *			print state to pixel
- *		End loop
- *		If then
- *			Print newline every (width / int_size) time
- *		End if
- *	End loop
- * End
  */
 
 void refresh_screen(unsigned char* disp, unsigned int int_size, unsigned int width, unsigned int height)
 {
-    //system("clear"); // system("cls"); for windows. Find out how to let it change
+    system("clear"); // system("cls"); for windows. Find out how to let it change
 	
 	int i, j;
 	unsigned char* p;
 	
+	// Use this if the screen buffer stores a pixels state per bit not per byte
+	/*
 	for (i = 1, p = disp; p < disp + (width * height / 8); i++, p++)
 	{
 		for (int j = 7; j >= 0; j--)
@@ -57,5 +45,25 @@ void refresh_screen(unsigned char* disp, unsigned int int_size, unsigned int wid
 			printf("\n");
 			i = 0;
 		}
+	}
+	*/
+	p = disp;
+	
+	for (i = 0; i < height; i++)
+	{
+		for (j = 0; j < width; j++)
+		{
+			if (*p)
+			{
+				printf("XX");
+			}
+			else
+			{
+				printf("  ");
+			}
+			
+			p++;
+		}
+		printf("\n");
 	}
 }
