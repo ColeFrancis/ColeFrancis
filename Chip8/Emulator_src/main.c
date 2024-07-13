@@ -10,6 +10,7 @@
 #undef BREAKPOINTS
 
 void run_cycle (Chip8_t *chip8);
+void delay (unsigned int milliseconds);
 
 void stack_push(unsigned short *stack, unsigned short *sp, unsigned short addr);
 unsigned short stack_pop(unsigned short *stack, unsigned short *sp);
@@ -41,7 +42,7 @@ int main (int argc, char **argv)
 		#ifdef BREAKPOINTS
 			getchar();
 		#else
-			// delay to 60 hz
+			delay(16);
 		#endif
 	}	
 	
@@ -84,7 +85,7 @@ void run_cycle (Chip8_t *chip8)
 			}
 			else if (inst == 0x00EE)
 			{
-				// 00EE: Return from subroutine
+				// 00EE: pull address off stack and jump to it
 				chip8->pc = stack_pop(chip8->stack, &(chip8->sp));
 			}
 		    break;
@@ -95,7 +96,7 @@ void run_cycle (Chip8_t *chip8)
 		    break;
 
 		case 0x2000:
-			// 2NNN: jump to subrutine
+			// 2NNN: push current address to stack, then jump to NNN
 			stack_push(chip8->stack, &(chip8->sp), chip8->pc);
 			
 			chip8->pc = inst & 0x0FFF;
@@ -303,7 +304,7 @@ void run_cycle (Chip8_t *chip8)
 				y++;
 			}
 			
-			refresh_screen(chip8->disp, 8, SCREEN_WIDTH, SCREEN_HEIGHT);
+			refresh_screen(chip8->disp, SCREEN_WIDTH, SCREEN_HEIGHT);
 			
 		    break;
 
@@ -439,17 +440,36 @@ void run_cycle (Chip8_t *chip8)
 		printf("index: 0x%X\n", chip8->index);
 		
 		for (i = 0; i <= 0xF; i++)
-			printf("v[%d]: 0x%X\n", i, chip8->v[i]);
+			printf("v[%X]: 0x%X\n", i, chip8->v[i]);
 		
 		printf("\n");
 		
-		for (int j = 0; j <= 0xF; j++)
+		printf("SP: 0x%X\n", chip8->sp);
+		for (int j = 0; j < chip8->sp; j++)
 		{
-			printf("stack[%d]: 0xA%X\n", j, chip8->stack[j]);
+			printf("stack[%X]: 0x%X\n", j, chip8->stack[j]);
 		}
 		
 		printf("\n");
+		
+		// temp start
+		printf("index: value stored\n");
+		for (unsigned short temp = chip8->index; temp < chip8->index + 10; temp++)
+		{
+			printf("0x%X: 0x%X\n", temp, chip8->mem[temp]);
+		}
+		
+		printf("...\n");
+		// temp end
 	#endif
+}
+
+void delay (unsigned int milliseconds)
+{
+	clock_t start = clock();
+	
+	while (clock() < start + milliseconds)
+		;
 }
 
 void stack_push(unsigned short *stack, unsigned short *sp, unsigned short addr)
@@ -458,7 +478,7 @@ void stack_push(unsigned short *stack, unsigned short *sp, unsigned short addr)
 	{
 		stack[*sp] = addr;
 		
-		*sp++;
+		(*sp)++;
 	}
 	else
 	{
@@ -469,9 +489,9 @@ void stack_push(unsigned short *stack, unsigned short *sp, unsigned short addr)
 
 unsigned short stack_pop(unsigned short *stack, unsigned short *sp)
 {
-	if (*sp <= 0)
+	if (*sp > 0)
 	{
-		return stack[*(--sp)];
+		return stack[--(*sp)];
 	}
 	else
 	{

@@ -9,7 +9,7 @@
  * Summary: When called, reads the contents of the display buffer and rerenders the screen, byte by byte (or bit by bit)
  */
 
-void refresh_screen(unsigned char* disp, unsigned int int_size, unsigned int width, unsigned int height)
+void refresh_screen(unsigned char* disp, unsigned int width, unsigned int height)
 {
     system("clear"); // system("cls"); for windows. Find out how to let it change
 	
