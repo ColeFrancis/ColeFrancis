@@ -19,7 +19,7 @@ typedef struct {
 	unsigned char sound;
 
 	unsigned short stack[16];
-	unsigned short *sp;
+	unsigned short sp;
 
 	unsigned char mem[4096];
 

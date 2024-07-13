@@ -3,18 +3,10 @@
 
 #include "io.h"
 
-/* File for all functions relating to getting keys and writing to the screen
- *
- * ex: 
- * 	refresh screen (reads through screen buffer and draws to screen)
- * 	save keys (saves the current states of the keys, maybe into a series of registers
- */
-
 /* 
  * Function: refresh_screen
  *
  * Summary: When called, reads the contents of the display buffer and rerenders the screen, byte by byte (or bit by bit)
- *
  */
 
 void refresh_screen(unsigned char* disp, unsigned int int_size, unsigned int width, unsigned int height)
@@ -66,4 +58,15 @@ void refresh_screen(unsigned char* disp, unsigned int int_size, unsigned int wid
 		}
 		printf("\n");
 	}
+}
+
+/* 
+ * Function: register_keys
+ *
+ * Summary: saves the state of each of the 16 keys (1 if pressed, 0 if not) into the keys array
+ */
+
+void register_keys(unsigned char *keys)
+{
+	
 }

@@ -16,6 +16,11 @@ void initialize (Chip8_t *chip8)
 	
 	chip8->pc = PROG_START;
 	
+	chip8->sp = 0;
+	
+	chip8->delay = 0;
+	chip8->sound = 0;
+	
 	for (p = chip8->v; p < chip8->v + 16; p++)
 	{
 		*p = 0;
