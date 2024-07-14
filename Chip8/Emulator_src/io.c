@@ -1,45 +1,68 @@
+#include <SDL2/SDL.h>
 #include <stdio.h>
-#include <stdlib.h>
 
+#include "init.h"
 #include "io.h"
 
-/* 
- * Function: refresh_screen
- *
- * Summary: When called, reads the contents of the display buffer and rerenders the screen, byte by byte (or bit by bit)
- */
-
-void refresh_screen(unsigned char* disp, unsigned int width, unsigned int height)
+void init_renderer(SDL_Window **window, SDL_Renderer **renderer)
 {
-    system("clear"); // system("cls"); for windows. Find out how to let it change
-	
-	int i, j;
-	unsigned char* p;
-	
-	// Use this if the screen buffer stores a pixels state per bit not per byte
-	/*
-	for (i = 1, p = disp; p < disp + (width * height / 8); i++, p++)
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		for (int j = 7; j >= 0; j--)
+		fprintf(stderr, "Error: SDL couldn't initialize. %s\n", SDL_GetError());
+		return 1;
+	}
+
+	*window = SDL_CreateWindow("Chip8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * WINDOW_SCALE, SCREEN_HEIGHT * WINDOW_SCALE, SDL_WINDOW_SHOWN);
+	if (*window == NULL)
+	{
+		fprintf(stderr, "Error: Window couldn't be created %s\n", SDL_GetError());
+		return 1;
+	}
+
+	*renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED);
+	if (*renderer == NULL)
+	{
+		fprintf(stderr, "Error: Renderer couldn't be created. %s\n", SDL_GetError());
+		return 1;
+	}
+}
+
+void refresh_screen(SDL_Renderer *renderer, unsigned char *disp)
+{
+	int i, j;
+	unsigned char* p = disp;
+
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+	SDL_RenderClear(renderer);
+
+	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+	for (i = 0; i < SCREEN_HEIGHT * WINDOW_SCALE; i += WINDOW_SCALE)
+	{
+		for (j = 0; j < SCREEN_WIDTH * WINDOW_SCALE; j += WINDOW_SCALE)
 		{
-			if (((*p) >> j) & 1)
+			if (*p)
 			{
-				printf("XX");
+				SDL_Rect rect;
+				rect.x = j;
+				rect.y = i;
+				rect.w = WINDOW_SCALE;
+				rect.h = WINDOW_SCALE;
+
+				SDL_RenderFillRect(renderer, &rect);
 			}
-			else
-			{
-				printf("  ");
-			}
-		}
-		
-		if (i == (width / int_size))
-		{
-			printf("\n");
-			i = 0;
+			
+			p++;
 		}
 	}
-	*/
-	p = disp;
+
+	SDL_RenderPresent(renderer);
+}
+
+void refresh_screen_terminal(unsigned char* disp, unsigned int width, unsigned int height)
+{
+	int i, j;
+	unsigned char* p = disp;
 	
 	for (i = 0; i < height; i++)
 	{
@@ -58,15 +81,4 @@ void refresh_screen(unsigned char* disp, unsigned int width, unsigned int height
 		}
 		printf("\n");
 	}
-}
-
-/* 
- * Function: register_keys
- *
- * Summary: saves the state of each of the 16 keys (1 if pressed, 0 if not) into the keys array
- */
-
-void register_keys(unsigned char *keys)
-{
-	
 }

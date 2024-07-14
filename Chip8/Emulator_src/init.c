@@ -10,7 +10,7 @@
  *
  */
 
-void initialize (Chip8_t *chip8)
+void init_chip (Chip8_t *chip8)
 {
 	unsigned char *p;
 	

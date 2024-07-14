@@ -1,3 +1,4 @@
+#include <SDL2/SDL.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -5,36 +6,48 @@
 #include "init.h"
 #include "io.h"
 
+// Debugging/Testing options
 #undef DEBUG
 #undef MANUAL_INST
 #undef BREAKPOINTS
+#undef DISP_TO_TERMINAL
 
 void run_cycle (Chip8_t *chip8);
 void delay (unsigned int milliseconds);
-
 void stack_push(unsigned short *stack, unsigned short *sp, unsigned short addr);
 unsigned short stack_pop(unsigned short *stack, unsigned short *sp);
 
-/*
- * Function: main
- *
- * Summary: Creates an instance of chip8, initializes it, then runs all the instructions
- *
- */
-
 int main (int argc, char **argv)
 {
+	int quit = 0;
+
 	Chip8_t *chip8 = (Chip8_t *) malloc(sizeof(Chip8_t));
 
-	initialize(chip8);
-	
+	init_chip(chip8);
 	load_rom(argv[1], chip8->mem + PROG_START, 4096 - PROG_START);
-	
-	for (int temp=0; temp < 4096 - PROG_START; temp++)
+
+	SDL_Window* window = NULL;
+	SDL_Renderer* renderer = NULL;
+	SDL_Event e;
+
+	init_renderer(&window, &renderer);
+
+	while (!quit)
 	{
-		register_keys(chip8->key);
+		// Check for program exit
+		while (SDL_PollEvent(&e) != 0)
+		{
+			if (e.type == SDL_QUIT)
+			{
+				quit = 1;
+			}
+		}
+
+		//register_keys(chip8->key);
 		
 		run_cycle(chip8);
+
+		refresh_screen(renderer, chip8->disp);
 		
 		chip8->delay--;
 		chip8->sound--;
@@ -42,10 +55,14 @@ int main (int argc, char **argv)
 		#ifdef BREAKPOINTS
 			getchar();
 		#else
-			delay(16);
+			//delay(16);
 		#endif
 	}	
 	
+	SDL_DestroyRenderer(renderer);
+	SDL_DestroyWindow(window);
+	SDL_Quit();
+
 	return 1;
 }
 
@@ -304,8 +321,10 @@ void run_cycle (Chip8_t *chip8)
 				y++;
 			}
 			
-			refresh_screen(chip8->disp, SCREEN_WIDTH, SCREEN_HEIGHT);
-			
+			#ifdef DISP_TO_TERMINAL
+				refresh_screen_terminal(chip8->disp, SCREEN_WIDTH, SCREEN_HEIGHT);
+			#endif
+
 		    break;
 
 		case 0xE000:
@@ -451,16 +470,6 @@ void run_cycle (Chip8_t *chip8)
 		}
 		
 		printf("\n");
-		
-		// temp start
-		printf("index: value stored\n");
-		for (unsigned short temp = chip8->index; temp < chip8->index + 10; temp++)
-		{
-			printf("0x%X: 0x%X\n", temp, chip8->mem[temp]);
-		}
-		
-		printf("...\n");
-		// temp end
 	#endif
 }
 
