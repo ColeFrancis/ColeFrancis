@@ -7,7 +7,7 @@
 #include "io.h"
 
 // Debugging/Testing options
-#undef DEBUG
+#undef PRINT_REGS
 #undef MANUAL_INST
 #undef BREAKPOINTS
 #undef DISP_TO_TERMINAL
@@ -34,17 +34,25 @@ int main (int argc, char **argv)
 
 	while (!quit)
 	{
-		// Check for program exit
+		// Check for program exit and keystrokes
 		while (SDL_PollEvent(&e) != 0)
 		{
-			if (e.type == SDL_QUIT)
+			switch( e.type)
 			{
-				quit = 1;
+				case SDL_QUIT:
+					quit = 1;
+					break;
+
+				case SDL_KEYDOWN:
+					update_keys (&e.key, chip8->key, 1);
+					break;
+
+				case SDL_KEYUP:
+					update_keys (&e.key, chip8->key, 0);
+					break;
 			}
 		}
 
-		//register_keys(chip8->key);
-		
 		run_cycle(chip8);
 
 		refresh_screen(renderer, chip8->disp);
@@ -453,7 +461,7 @@ void run_cycle (Chip8_t *chip8)
 		    break;
 	}
 	
-	#ifdef DEBUG
+	#ifdef PRINT_REGS
 		printf("inst: 0x%X\n", inst);
 		printf("pc: 0x%X\n", chip8->pc);
 		printf("index: 0x%X\n", chip8->index);
