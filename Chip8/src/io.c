@@ -1,10 +1,9 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 
-#include "init.h"
 #include "io.h"
 
-void init_renderer(SDL_Window **window, SDL_Renderer **renderer)
+int init_renderer(SDL_Window **window, SDL_Renderer **renderer, unsigned int width, unsigned int height)
 {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) < 0)
 	{
@@ -12,7 +11,7 @@ void init_renderer(SDL_Window **window, SDL_Renderer **renderer)
 		return 1;
 	}
 
-	*window = SDL_CreateWindow("Chip8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH * WINDOW_SCALE, SCREEN_HEIGHT * WINDOW_SCALE, SDL_WINDOW_SHOWN);
+	*window = SDL_CreateWindow("Chip8", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width * WINDOW_SCALE, height * WINDOW_SCALE, SDL_WINDOW_SHOWN);
 	if (*window == NULL)
 	{
 		fprintf(stderr, "Error: Window couldn't be created %s\n", SDL_GetError());
@@ -27,7 +26,7 @@ void init_renderer(SDL_Window **window, SDL_Renderer **renderer)
 	}
 }
 
-void refresh_screen(SDL_Renderer *renderer, unsigned char *disp)
+void refresh_screen(SDL_Renderer *renderer, unsigned char *disp, unsigned int width, unsigned int height)
 {
 	int i, j;
 	unsigned char* p = disp;
@@ -37,9 +36,9 @@ void refresh_screen(SDL_Renderer *renderer, unsigned char *disp)
 
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-	for (i = 0; i < SCREEN_HEIGHT * WINDOW_SCALE; i += WINDOW_SCALE)
+	for (i = 0; i < height * WINDOW_SCALE; i += WINDOW_SCALE)
 	{
-		for (j = 0; j < SCREEN_WIDTH * WINDOW_SCALE; j += WINDOW_SCALE)
+		for (j = 0; j < width * WINDOW_SCALE; j += WINDOW_SCALE)
 		{
 			if (*p)
 			{
@@ -57,30 +56,6 @@ void refresh_screen(SDL_Renderer *renderer, unsigned char *disp)
 	}
 
 	SDL_RenderPresent(renderer);
-}
-
-void refresh_screen_terminal(unsigned char* disp, unsigned int width, unsigned int height)
-{
-	int i, j;
-	unsigned char* p = disp;
-	
-	for (i = 0; i < height; i++)
-	{
-		for (j = 0; j < width; j++)
-		{
-			if (*p)
-			{
-				printf("XX");
-			}
-			else
-			{
-				printf("  ");
-			}
-			
-			p++;
-		}
-		printf("\n");
-	}
 }
 
 void update_keys (SDL_KeyboardEvent *key, unsigned char *key_buffer, unsigned char state)

@@ -27,6 +27,8 @@ void init_chip (Chip8_t *chip8)
 	}
 	
 	load_fonts(chip8->mem + FONT_START);
+
+	chip8->refresh_disp = 0;
 }
 
 void load_fonts(unsigned char *mem_start)

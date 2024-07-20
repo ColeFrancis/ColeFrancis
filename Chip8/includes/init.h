@@ -26,6 +26,7 @@ typedef struct {
 	unsigned char key[16];
 
 	unsigned char disp [SCREEN_WIDTH * SCREEN_HEIGHT];
+	unsigned char refresh_disp;
 } Chip8_t;
 
 void init_chip (Chip8_t *chip8);

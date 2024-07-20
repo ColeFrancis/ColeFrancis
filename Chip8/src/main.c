@@ -8,9 +8,7 @@
 
 // Debugging/Testing options
 #undef PRINT_REGS
-#undef MANUAL_INST
 #undef BREAKPOINTS
-#undef DISP_TO_TERMINAL
 
 void run_cycle (Chip8_t *chip8);
 void delay (unsigned int milliseconds);
@@ -30,7 +28,7 @@ int main (int argc, char **argv)
 	SDL_Renderer* renderer = NULL;
 	SDL_Event e;
 
-	init_renderer(&window, &renderer);
+	init_renderer(&window, &renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	while (!quit)
 	{
@@ -55,15 +53,19 @@ int main (int argc, char **argv)
 
 		run_cycle(chip8);
 
-		refresh_screen(renderer, chip8->disp);
-		
+		if (chip8->refresh_disp)
+		{
+			refresh_screen(renderer, chip8->disp, SCREEN_WIDTH, SCREEN_HEIGHT);
+			chip8->refresh_disp = 0;
+		}
+
 		chip8->delay--;
 		chip8->sound--;
 		
 		#ifdef BREAKPOINTS
 			getchar();
 		#else
-			//delay(16);
+			delay(16);
 		#endif
 	}	
 	
@@ -82,16 +84,7 @@ void run_cycle (Chip8_t *chip8)
 	
 	int i;
 	
-	#ifdef MANUAL_INST
-		char string[10];
-		
-		printf("Enter inst: ");
-		scanf("%s", string);
-		
-		inst = (unsigned short)strtol(string, NULL, 16);
-	#else
-		inst = (chip8->mem[chip8->pc] << 8) | chip8->mem[chip8->pc+1];
-	#endif
+	inst = (chip8->mem[chip8->pc] << 8) | chip8->mem[chip8->pc+1];
 	
 	chip8->pc += 2;
 	
@@ -328,10 +321,8 @@ void run_cycle (Chip8_t *chip8)
 				
 				y++;
 			}
-			
-			#ifdef DISP_TO_TERMINAL
-				refresh_screen_terminal(chip8->disp, SCREEN_WIDTH, SCREEN_HEIGHT);
-			#endif
+
+			chip8->refresh_disp = 1;
 
 		    break;
 
