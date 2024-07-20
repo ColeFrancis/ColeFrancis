@@ -31,7 +31,6 @@ typedef struct {
 
 void init_chip (Chip8_t *chip8);
 void load_fonts(unsigned char *mem_start);
-
 void load_rom (char *file_name, unsigned char *mem_start, int load_max_size);
 
 #endif

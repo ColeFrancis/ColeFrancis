@@ -6,7 +6,7 @@
 #include "init.h"
 #include "io.h"
 
-// Debugging/Testing options
+// Debugging and testing options
 #undef PRINT_REGS
 #undef BREAKPOINTS
 
