@@ -20,14 +20,20 @@ int main (int argc, char **argv)
 	int quit = 0;
 
 	Chip8_t *chip8 = (Chip8_t *) malloc(sizeof(Chip8_t));
-
-	init_chip(chip8);
-	load_rom(argv[1], chip8->mem + PROG_START, 4096 - PROG_START);
-
+	
 	SDL_Window* window = NULL;
 	SDL_Renderer* renderer = NULL;
 	SDL_Event e;
 
+	if (argc < 2)
+	{
+		fprintf(stderr, "Error: no program (ch8) file included\n");
+		return 1;
+	}
+
+	init_chip(chip8);
+	load_rom(argv[1], chip8->mem + PROG_START, 4096 - PROG_START);
+	
 	init_renderer(&window, &renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	while (!quit)
@@ -40,7 +46,7 @@ int main (int argc, char **argv)
 				case SDL_QUIT:
 					quit = 1;
 					break;
-
+				
 				case SDL_KEYDOWN:
 					update_keys (&e.key, chip8->key, 1);
 					break;
@@ -58,9 +64,6 @@ int main (int argc, char **argv)
 			refresh_screen(renderer, chip8->disp, SCREEN_WIDTH, SCREEN_HEIGHT);
 			chip8->refresh_disp = 0;
 		}
-
-		chip8->delay--;
-		chip8->sound--;
 		
 		#ifdef BREAKPOINTS
 			getchar();
@@ -451,6 +454,9 @@ void run_cycle (Chip8_t *chip8)
 			}
 		    break;
 	}
+
+	chip8->delay--;
+	chip8->sound--;
 	
 	#ifdef PRINT_REGS
 		printf("inst: 0x%X\n", inst);
