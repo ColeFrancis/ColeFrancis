@@ -1,6 +1,6 @@
 # Chip8 emulator
 
-A custom chip8 emulator written in ANSI C for linux. There is not a working build for windows.
+A custom chip8 emulator written in ANSI C for linux.
 
 The SDL2 library was used to handle the rendering and the keyboard inputs to greatly simplify the code.
 
@@ -20,4 +20,4 @@ Use the following command to run the emulator:
 
 ## Final notes
 
-This project has been finished and I do not intend to return to add features, except to fix any bugs
+This project has been finished and I do not intend to return to add features, except to fix any bugs.
