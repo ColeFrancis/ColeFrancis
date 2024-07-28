@@ -12,5 +12,5 @@ Dependencies: SDL2 library for rendering and keyboard input. There are many guid
 After cloning the repository, run make to build the project.
 
 ```bash
-    $./chip8 <.ch8 binary file>
+./chip8 <.ch8 binary file>
 ```
