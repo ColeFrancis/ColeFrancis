@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<body align = "center">
+<canvas id="myCanvas" width = "700" height = "700" style = "border:1px solid black;">
+</canvas>
+<script>
+
+let canvas = document.getElementById("myCanvas");
+let ctx = canvas.getContext("2d");
+
+const CANVAS_WIDTH = canvas.scrollWidth;
+const CANVAS_HEIGHT = canvas.scrollHeight;
+
+const GRID_WIDTH = 200;
+const GRID_HEIGHT = 200;
+
+const FPS = 30;
+
+const DRAW_SIZE = 4;
+
+let mouseIsDown = false;
+
+var relativeX;
+var relativeY;
+
+let color = "#C2B280";
+let colorChanger = 0;
+let dColor = .5;
+
+function createGrid(thisGridSizeX, thisGridSizeY) {
+    let thisArray = [];
+
+    for (let i = 0; i < thisGridSizeY; i++) {
+        thisArray.push([]);
+
+        if (i == thisGridSizeY - 1) {
+            for (let j = 0; j < thisGridSizeX; j++) {
+                thisArray[i].push('#000000');
+            }
+        } else {
+            for (let j = 0; j < thisGridSizeX; j++) {
+                thisArray[i].push('0');
+            }
+        }
+    }
+
+    return thisArray;
+}
+
+function drawEnvironment(thisGrid) {
+    ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+    const GRID_WIDTH = thisGrid[0].length;
+    const GRID_HEIGHT = thisGrid.length;
+
+    const CELL_WIDTH = CANVAS_WIDTH / GRID_WIDTH;
+    const CELL_HEIGHT = CANVAS_HEIGHT / GRID_HEIGHT;
+
+    for (let i = 0; i < GRID_HEIGHT; i++) {
+        for (let j = 0; j < GRID_WIDTH; j++) {      
+            if (thisGrid[j][i] != '0') {
+                
+                ctx.fillStyle = thisGrid[j][i];
+                ctx.fillRect(i * CELL_WIDTH, j * CELL_HEIGHT, CELL_WIDTH + 1, CELL_HEIGHT + 1);
+            }
+        }
+    }
+}
+
+function updateEnvironment(thisGrid) {
+    nextGrid = createGrid(thisGrid[0].length, thisGrid.length);
+
+    for (let y = 0; y < thisGrid.length - 1; y++) {
+        for (let x = 0; x < thisGrid[y].length; x++) {
+            if (thisGrid[y][x] != '0') {
+                thisColor = thisGrid[y][x];
+
+                if (thisGrid[y + 1][x] == '0') {
+                    nextGrid[y][x] = '0';
+                    nextGrid[y + 1][x] = thisColor;
+                } else {
+                    let direction = returnRandom();
+                    
+                    if (thisGrid[y + 1][x + direction] == '0') {
+                        nextGrid[y][x] = "0";
+                        nextGrid[y + 1][x + direction] = thisColor;
+                    } else if (thisGrid[y + 1][x - direction] == "0") {
+                        nextGrid[y][x] = "0";
+                        nextGrid[y + 1][x - direction] = thisColor;
+                    } else {
+                        nextGrid[y][x] = thisColor;
+                    }
+                }
+            }
+        }
+    }
+
+    return nextGrid;
+}
+
+function returnRandom() {
+    let random = Math.random() * 2;
+
+    if (random >= 1) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
+let gameGrid = createGrid(GRID_WIDTH, GRID_HEIGHT);
+
+function findMousePosition(thisCanvas, click, thisGrid) {
+    let rect = thisCanvas.getBoundingClientRect();
+    let mouseX = click.clientX - rect.left;
+    let mouseY = click.clientY - rect.top;
+    relativeX = Math.floor(mouseX * GRID_WIDTH / CANVAS_WIDTH);
+    relativeY = Math.floor(mouseY * GRID_HEIGHT / CANVAS_HEIGHT);
+}
+
+canvas.addEventListener('mousedown', (e) => {
+    mouseIsDown = true;
+})
+canvas.addEventListener('mouseup', (e) => {
+    mouseIsDown = false;
+})
+canvas.addEventListener('mousemove', (e) => {
+    findMousePosition(canvas, e, gameGrid);
+})
+
+function primaryLoop() {
+    gameGrid = updateEnvironment(gameGrid);
+
+    
+    if (mouseIsDown) {
+        colorChanger += dColor;
+        if (colorChanger >= 255 || colorChanger <= 0) {
+            dColor *= -1;
+        }  
+        
+        color = "rgb(" + (255 - Math.round(colorChanger)) + ", 0," + Math.round(colorChanger) + ")";
+
+        for (let i = relativeY - Math.floor(DRAW_SIZE / 2); i <= relativeY + Math.floor(DRAW_SIZE / 2); i++) {
+            for (let j = relativeX - Math.floor(DRAW_SIZE / 2); j <= relativeX + Math.floor(DRAW_SIZE / 2); j++) {
+                gameGrid[i][j] = color;
+            }
+        }
+    }
+
+    drawEnvironment(gameGrid);
+}
+
+const CLOCK = setInterval(primaryLoop, 1000 / FPS);
+
+</script>
+</body>
+</html>

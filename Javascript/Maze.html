@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<body align = "center">
+<canvas id="myCanvas" width = "1000" height = "1000" style = "border:1px solid black;">
+</canvas>
+<script>
+
+let canvas = document.getElementById("myCanvas");
+let ctx = canvas.getContext("2d");
+
+const CANVAS_WIDTH = canvas.scrollWidth;
+const CANVAS_HEIGHT = canvas.scrollHeight;
+
+const MAZE_WIDTH = 100;
+const MAZE_HEIGHT = 100;
+
+const FPS = 1000;
+
+function createGrid(thisGridSizeX, thisGridSizeY) {
+    let thisArray = [];
+
+    for (let i = 0; i < thisGridSizeX; i++) {
+        thisArray.push([]);
+
+        for (let j = 0; j < thisGridSizeY; j++) {
+            thisArray[i].push(0);
+        }
+    }
+
+    return thisArray;
+}
+
+// Dont use during running of program
+function drawGrid(thisGrid, environmentWidth, environmentHeight) {
+    let thisGridWidth = thisGrid.length;
+    let thisGridHeight = thisGrid[0].length;
+
+    let cellWidth = environmentWidth / thisGridWidth;
+    let cellHeight = environmentHeight / thisGridHeight;
+
+    for (let i = 0; i < thisGridWidth; i++) {
+        for (let j = 0; j < thisGridHeight; j++) {
+            if (thisGrid[i][j] == 1) {
+                //ctx.clearRect(i * cellWidth, j * cellHeight, cellWidth, cellHeight);
+                fillPixel(i, j, thisGrid, "#FFFF00");
+            }
+        }
+    }
+}
+
+function fillLine(startX, startY, endX, endY, thisGrid, pixelColor) {
+    let thisGridWidth = thisGrid.length;
+    let thisGridHeight = thisGrid[0].length;
+
+    let pixelWidth = CANVAS_WIDTH / thisGridWidth;
+    let pixelHeight = CANVAS_HEIGHT / thisGridHeight;
+
+    //let rectWidth = Math.abs(startX - endX) + 1;
+    //let rectHeight = Math.abs(startY - endY) + 1;
+    let rectWidth = startX - endX;
+    let rectHeight = startY - endY;
+    
+    // 2x faster than Math.abs
+    rectWidth = (rectWidth < 0 ? -rectWidth : rectWidth) + 1;
+    rectHeight = (rectHeight < 0 ? -rectHeight : rectHeight) + 1;
+
+    let rectX = startX < endX ? startX : endX;
+    let rectY = startY < endY ? startY : endY;
+
+    ctx.fillStyle = pixelColor;
+    ctx.fillRect(rectX * pixelWidth, rectY * pixelHeight, rectWidth * pixelWidth, rectHeight * pixelHeight);
+}
+
+class Head {
+    possibleMoves = [];
+
+    constructor (posX, posY) {
+        this.posX = posX;
+        this.posY = posY;
+
+        this.currentPath = [[posX, posY]];
+    }
+    //  look one by one two spaces away in each direction. If that space hasnt been visited, add it to a list of possible moves
+    //  if the length of the list >= 0 then
+    //      Add current space to an array of already visited
+    //      randomly choose one of the possible moves and move to it
+    //      draw new space and the one between it to sreen as red
+    //      move to the next space
+    //  else
+    //      move back a space in your array of already visited.
+    //      draw the last space to the screen as white
+    //      if current space is the starting space, end
+    move (thisGrid) {
+        thisGrid[this.posX][this.posY] = 1;
+        this.possibleMoves = [];
+
+        if (this.posX < thisGrid.length - 2 && thisGrid[this.posX + 2][this.posY] == 0) {
+            this.possibleMoves.push([2, 0]);
+        }
+        if (this.posY > 2 && thisGrid[this.posX][this.posY - 2] == 0) {
+            this.possibleMoves.push([0, -2]);
+        }
+        if (this.posX > 2 && thisGrid[this.posX - 2][this.posY] == 0) {
+            this.possibleMoves.push([-2, 0]);
+        }
+        if (this.posY < thisGrid[0].length - 2 && thisGrid[this.posX][this.posY + 2] == 0) {
+            this.possibleMoves.push([0, 2]);
+        }
+
+        if (this.possibleMoves.length > 0) {
+            let nextMove = this.chooseItem(this.possibleMoves);
+
+            fillLine(this.posX, this.posY, this.posX + nextMove[0], this.posY + nextMove[1], thisGrid, "#FF0000");
+
+            this.posX += nextMove[0];
+            this.posY += nextMove[1];
+
+            this.currentPath.push([this.posX, this.posY]);
+        } else {
+            if (this.currentPath.length > 1) {
+                this.currentPath.pop();
+
+                let backMove = [this.currentPath[this.currentPath.length - 1][0], this.currentPath[this.currentPath.length - 1][1]];
+
+                fillLine(this.posX, this.posY, backMove[0], backMove[1], thisGrid, "#FFFFFF");
+                
+                this.posX = backMove[0];
+                this.posY = backMove[1];
+
+            } else {
+                clearInterval(CLOCK);
+                console.log("Done");
+            }
+        }
+    }
+
+    chooseItem(thisArray) {
+        let numItems = thisArray.length;
+        let randomNum = Math.floor(Math.random() * numItems);
+
+        return thisArray[randomNum];
+    }
+}
+
+ctx.fillStyle = "#000000";
+ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+let newMaze = createGrid(MAZE_WIDTH, MAZE_HEIGHT);
+
+let mazeHead = new Head(1, 1);
+
+const CLOCK = setInterval(primaryLoop, 1000 / FPS);
+
+function primaryLoop() {
+    mazeHead.move(newMaze);
+}
+</script>
+</body>
+</html>

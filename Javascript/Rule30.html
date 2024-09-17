@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<body align = "center">
+<canvas id="myCanvas" width = "1200" height = "4000" style = "border:1px solid black;">
+</canvas>
+<script>
+
+let canvas = document.getElementById("myCanvas");
+let ctx = canvas.getContext("2d");
+
+const CANVAS_WIDTH = canvas.scrollWidth;
+const CANVAS_HEIGHT = canvas.scrollHeight;
+
+const GRID_SIZE = CANVAS_HEIGHT;
+
+function CreateGrid(thisGridSizeX, thisGridSizeY) {
+    let thisArray = [];
+
+    for (let i = 0; i < thisGridSizeY; i++) {
+        thisArray.push([]);
+
+        for (let j = 0; j < thisGridSizeX; j++) {
+            thisArray[i].push(0);
+        }
+    }
+
+    return thisArray;
+}
+
+function DrawGrid(thisGrid) {
+    const THIS_GRID_SIZE = thisGrid.length;
+    const SIZE_DIFFERENCE = THIS_GRID_SIZE - CANVAS_WIDTH;
+
+    const CELL_SIZE = CANVAS_HEIGHT / THIS_GRID_SIZE;
+
+    for (let y = 0; y < THIS_GRID_SIZE; y++) {
+        for (let x = (SIZE_DIFFERENCE / 2); x < THIS_GRID_SIZE; x++) {      
+            if (thisGrid[y][x] == 1) {
+                
+                ctx.fillStyle = "#000000";
+                ctx.fillRect((x - (SIZE_DIFFERENCE / 2)) * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+            }
+        }
+    }
+}
+
+function Rule30(thisGrid) {
+    // Each Row
+    for (let y = 1; y < thisGrid.length; y++) {
+        // Each item in row
+        for (let x = 0; x < thisGrid[y].length; x++) {
+            if ((thisGrid[y - 1][x - 1] + thisGrid[y - 1][x] + thisGrid[y - 1][x + 1] == 1) || (thisGrid[y - 1][x] && thisGrid[y - 1][x + 1] && !thisGrid[y - 1][x - 1])) {
+                thisGrid[y][x] = 1;
+            }
+        }
+    }
+}
+
+let gameGrid = CreateGrid(GRID_SIZE, GRID_SIZE);
+
+gameGrid[0][GRID_SIZE / 2] = 1;
+
+Rule30(gameGrid);
+
+DrawGrid(gameGrid);
+
+</script>
+</body>
+</html>
