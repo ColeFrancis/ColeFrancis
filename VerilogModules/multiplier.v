@@ -15,7 +15,7 @@ module multiplier #(
     genvar i;
     generate
         for (i=0; i<N; i=i+1) begin
-            assign inB[i] = a & {N{b[i]}};
+            assign inB[i] = a & {N{b[i]}}; // If a is 0, inB = 0, if a = 1, inB = b
             
             adder #(N) add_inst (inA[i], inB[i], {inA[i+1], p[i]});
         end
