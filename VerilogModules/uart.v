@@ -1,5 +1,3 @@
-`timescale 1ns / 1ps
-
 module uart_rx #(
     parameter BAUD = 10_000,
     parameter CLK_FREQ = 100_000_000 // Basys 3 clk Freq is 100 MHz
