@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @ColeFrancis
-- I am currently studying computer engineering at Utah State University
+- I am currently studying computer engineering and applied mathematics at Utah State University
 - I am interested in computer architecture, and complex systems theory.
 
 Some of my other projects are found under the following repositories:
