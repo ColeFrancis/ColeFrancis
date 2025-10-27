@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<body align = "center">
+<canvas id="myCanvas" width = "700" height = "700" style = "border:1px solid black;">
+</canvas>
+<script>
+
+let canvas = document.getElementById("myCanvas");
+let ctx = canvas.getContext("2d");
+
+const CANVAS_WIDTH = canvas.scrollWidth;
+const CANVAS_HEIGHT = canvas.scrollHeight;
+
+const GRID_SIZE = 70;
+const CENTER = Math.floor(GRID_SIZE/2);
+
+const MAX_STEPS = 2084;
+const LINES_PER_SECOND = 100;
+
+class GameSquare {
+    visited = false;
+    value = 0; 
+
+    constructor(xPos, yPos) {
+        this.xPos = xPos;
+        this.yPos = yPos;
+    }
+}
+
+class Grid {
+    constructor (sizeX, sizeY) {
+        this.array = [];
+
+        for (let i = 0; i < sizeY; i++) {
+            this.array.push([]);
+
+            for (let j = 0; j < sizeX; j++) {
+                this.array[i].push(new GameSquare(j, i));
+            }
+        }
+    }
+
+    fillGridValues(startX, startY) {
+        const NUMBER_OF_LAYERS = this.array.length - 1;
+
+        let x = startX;
+        let y = startY;
+
+        let dx = -1;
+        let dy = -1;
+
+        let currentValue = 1;
+
+        this.array[y][x].value = currentValue;
+
+        for (let layer = 1; layer <= NUMBER_OF_LAYERS; layer++) {
+
+            for (let i = 1; i <= layer; i++) {
+                currentValue++;
+
+                x += dx;
+
+                this.array[y][x].value = currentValue;
+            }
+            for (let i = 1; i <= layer; i++) {
+                currentValue++;
+                
+                y += dy;
+
+                this.array[y][x].value = currentValue;
+            }
+            
+            dx *= -1;
+            dy *= -1;
+        }
+        // fills out final unfinished row
+        for (let i = 0; i < NUMBER_OF_LAYERS; i++) {
+            currentValue++;
+
+            x += dx
+
+            this.array[y][x].value = currentValue;
+        }
+    }
+
+}
+
+class Knight {
+    visitedCells = [];
+    
+    constructor(xPos, yPos) {
+        this.xPos = xPos;
+        this.yPos = yPos;
+    }
+
+    returnKnightsNextCell(grid) {
+        let potentialCells = [];
+
+        if (grid.array[this.yPos - 1][this.xPos + 2].visited == false) {
+            potentialCells.push(grid.array[this.yPos-1][this.xPos+2]);
+        }
+        if (grid.array[this.yPos - 2][this.xPos + 1].visited == false) {
+            potentialCells.push(grid.array[this.yPos - 2][this.xPos + 1]);
+        }
+        if (grid.array[this.yPos - 2][this.xPos - 1].visited == false) {
+            potentialCells.push(grid.array[this.yPos - 2][this.xPos - 1]);
+        }
+        if (grid.array[this.yPos - 1][this.xPos - 2].visited == false) {
+            potentialCells.push(grid.array[this.yPos - 1][this.xPos - 2]);
+        }
+        if (grid.array[this.yPos + 1][this.xPos - 2].visited == false) {
+            potentialCells.push(grid.array[this.yPos + 1][this.xPos - 2]);
+        }
+        if (grid.array[this.yPos + 2][this.xPos - 1].visited == false) {
+            potentialCells.push(grid.array[this.yPos + 2][this.xPos - 1]);
+        }
+        if (grid.array[this.yPos + 2][this.xPos + 1].visited == false) {
+            potentialCells.push(grid.array[this.yPos + 2][this.xPos + 1]);
+        }
+        if (grid.array[this.yPos + 1][this.xPos + 2].visited == false) {
+            potentialCells.push(grid.array[this.yPos + 1][this.xPos + 2]);
+        }
+
+        let lowestValueCell = potentialCells[0];
+        for (let i = 1; i < potentialCells.length; i++) {
+            if (potentialCells[i].value < lowestValueCell.value) {
+                lowestValueCell = potentialCells[i];
+            }
+        }
+
+        return lowestValueCell;
+    }
+    
+    /*
+    method MOVE knight to new gridsquare
+        SET knights current gridsquare to visited = true
+        DRAW a line from the knights current position to the new gridsquare
+        SET the position of the knight to that new gridsquare
+    END method
+    */
+
+    moveToNextCell(nextCell, grid, lineColor) {
+        grid.array[this.yPos][this.xPos].visited = true;
+
+        this.drawLine(this.xPos, this.yPos, nextCell.xPos, nextCell.yPos, lineColor);
+
+        this.xPos = nextCell.xPos;
+        this.yPos = nextCell.yPos;
+    }
+
+    drawLine(fromX, fromY, toX, toY, drawColor) {
+        ctx.beginPath();
+        ctx.moveTo(fromX * CANVAS_WIDTH/GRID_SIZE, fromY * CANVAS_HEIGHT/GRID_SIZE);
+        ctx.lineTo(toX * CANVAS_WIDTH/GRID_SIZE, toY * CANVAS_HEIGHT/GRID_SIZE);
+        ctx.strokeStyle = drawColor;
+        ctx.stroke();
+    }
+}
+
+//used for testing and debugging
+function DrawGrid(thisGrid) {
+    const GRID_WIDTH = thisGrid.array[0].length;
+    const GRID_HEIGHT = thisGrid.array.length;
+
+    const CELL_WIDTH = CANVAS_WIDTH / GRID_WIDTH;
+    const CELL_HEIGHT = CANVAS_HEIGHT / GRID_HEIGHT;
+
+    for (let i = 0; i < GRID_HEIGHT; i++) {
+        for (let j = 0; j < GRID_WIDTH; j++) {      
+            if (thisGrid.array[j][i].visited == true) {
+                
+                ctx.fillStyle = "#FF0000";
+                ctx.fillRect(i * CELL_WIDTH, j * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
+            }
+            
+            ctx.strokeRect(i * CELL_WIDTH, j * CELL_HEIGHT, CELL_WIDTH, CELL_HEIGHT);
+
+            ctx.fillStyle = "#000000";
+            ctx.fillText(thisGrid.array[j][i].value, i * CELL_WIDTH + 10, j * CELL_HEIGHT + 20);
+        }
+    }
+}
+
+let backgroundGrid = new Grid(GRID_SIZE, GRID_SIZE);
+backgroundGrid.fillGridValues(CENTER, CENTER);
+
+let knight = new Knight(CENTER, CENTER);
+
+let color = "rgb(0, 0, 0)";
+let colorChanger = 0;
+
+let steps = 0;
+
+function primaryLoop() {
+    
+    colorChanger += 255 / MAX_STEPS;
+    if (colorChanger > 255)
+        colorChanger = 255;
+    
+    color = "rgb(" + (255 - Math.round(colorChanger)) + ", 0," + Math.round(colorChanger) + ")";
+
+    let nextMove = knight.returnKnightsNextCell(backgroundGrid);
+    knight.moveToNextCell(nextMove, backgroundGrid, color);
+
+    steps ++;
+    if (steps >= MAX_STEPS) {
+        clearInterval(CLOCK);
+    }
+}
+
+const CLOCK = setInterval(primaryLoop, 1000 / LINES_PER_SECOND);
+
+</script>
+</body>
+</html>
