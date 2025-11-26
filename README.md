@@ -6,3 +6,4 @@ Some of my other projects are found under the following repositories:
 - [SIMD/Vector inst accelerator on FPGA with Cpp Interface](https://github.com/ColeFrancis/FPGA-Vector-Accelerator-with-cpp-Interface-V1)
 - [6502 microprocessor emulator in Cpp](https://github.com/ColeFrancis/6502)
 - [Chip8 Interpreter](https://github.com/ColeFrancis/Chip8_Interpreter)
+- [Audio Syntesiser with Loop Recording on STM32 Microcontroller](https://github.com/lmp03/ECE-3710-Final-Project)
