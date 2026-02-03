@@ -54,7 +54,7 @@ Segment Pattern::add_segment() {
         end_points.pop_back();
     } while (is_occupied(point.end));
 
-
+    
 }
 
 bool Pattern::is_occupled(Point potential_point) {
