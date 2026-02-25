@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @ColeFrancis
-- I am currently studying computer engineering and applied mathematics at Utah State University
-- I am interested in computer architecture, and complex systems theory.
+- I am currently a Junior studying computer engineering and applied mathematics at Utah State University
+- I am interested in custom hardware acceleration, dynamical systems, and their application in machine learning.
 
 Some of my other projects are found under the following repositories:
 - [I gave a workshop teaching to build Neural Networks to classify signals for Digital Signal Processing](https://github.com/ColeFrancis/Wave2Net)
