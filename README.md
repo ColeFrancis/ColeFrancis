@@ -1,6 +1,6 @@
 - 👋 Hi, I’m @ColeFrancis
 - I am currently a junior studying Computer Engineering and Applied Mathematics at Utah State University
-- I am interested in Embedded Development, Hardware Acceleration, and dynamical systems and their application in machine learning.
+- I am interested in using mathematics to design advanced computer systems and discover new computing paradigms
 
 This repository contains small experiments.
 
