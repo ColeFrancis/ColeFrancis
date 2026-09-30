@@ -5,7 +5,7 @@
 This repository contains small experiments.
 
 My largest and current project is found here:
-- [Work-in-progress research platform for modeling and analyzing complex systems](https://github.com/ColeFrancis/LOI)
+- [Work-in-progress research tool for modeling and analyzing complex systems](https://github.com/ColeFrancis/LOI)
 
 Some of my medium-sized projects are found under the following repositories:
 - [I gave a workshop teaching to build Neural Networks to classify signals for Digital Signal Processing](https://github.com/ColeFrancis/Wave2Net)
