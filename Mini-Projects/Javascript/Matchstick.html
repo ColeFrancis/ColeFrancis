@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<body align = "center">
+<canvas id="myCanvas" width = "1000" height = "1000" style = "border:1px solid black;">
+</canvas>
+<script>
+
+let canvas = document.getElementById("myCanvas");
+let ctx = canvas.getContext("2d");
+
+const CANVAS_WIDTH = canvas.scrollWidth;
+const CANVAS_HEIGHT = canvas.scrollHeight;
+
+const GRID_WIDTH = 1000;
+const GRID_HEIGHT = 1000;
+
+function createGrid(thisGridSizeX, thisGridSizeY) {
+    let thisArray = [];
+
+    for (let i = 0; i < thisGridSizeX; i++) {
+        thisArray.push([]);
+
+        for (let j = 0; j < thisGridSizeY; j++) {
+            thisArray[i].push(0);
+        }
+    }
+
+    return thisArray;
+}
+
+function drawGrid(thisGrid) {
+    let thisGridWidth = thisGrid.length;
+    let thisGridHeight = thisGrid[0].length;
+
+    let cellWidth = CANVAS_WIDTH / thisGridWidth;
+    let cellHeight = CANVAS_HEIGHT / thisGridHeight;
+
+    for (let i = 0; i < thisGridWidth; i++) {
+        for (let j = 0; j < thisGridHeight; j++) {
+            if (thisGrid[i][j] == 1) {
+                //ctx.clearRect(i * cellWidth, j * cellHeight, cellWidth, cellHeight);
+                fillPixel(i, j, thisGrid, "#000000");
+            }
+        }
+    }
+}
+
+function fillPixel(x, y, thisGrid, pixelColor) {
+    let pixelWidth = CANVAS_WIDTH / thisGrid.length;
+    let pixelHeight = CANVAS_HEIGHT / thisGrid[0].length;
+
+    ctx.fillStyle = pixelColor;
+    ctx.fillRect(
+        x * pixelWidth,
+        y * pixelHeight,
+        pixelWidth,
+        pixelHeight
+    );
+}
+
+class Drawer {
+
+    constructor(posX, posY, grid) {
+        this.openEnds = [];
+
+        this.openEnds.push({
+            last: [posX, posY],
+            pos: [posX, posY + 2],
+        });
+
+        grid[posX][posY-2] = 1;
+        grid[posX][posY-1] = 1;
+        grid[posX][posY  ] = 1;
+        grid[posX][posY+1] = 1;
+        grid[posX][posY+2] = 1;
+
+        this.pos = [posX, posY-2]; 
+        this.last = [posX, posY];
+        this.up = false;
+
+        console.log(this.pos, this.last);
+    }
+
+    // Place next ractangle on this.pos in the orientation indicated by this.up
+    // Then push left open end, update current open end and this.up
+    //     if left or right ends are already 1, dont push, 
+    //          search through open ends to remove that open end if it is there,
+    //          and use openEnds to get next position
+    step(grid) {
+        if (this.pos[0] <= 1 || this.pos[0] >= grid.length-2 || this.pos[1] <= 1 || this.pos[1] >= grid[0].length-2 ) {
+            return false;
+        }
+
+        if (!this.up) {
+            let currPosX = this.pos[0];
+            let currPosY = this.pos[1];
+
+            // right is next
+            if (this.last[1] > this.pos[1]) {
+                // push left open end if it is not alredy occupied on the grid
+                if (grid[this.pos[0]-2][this.pos[1]] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] - 2 && pos[1] == this.pos[1]
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+                } 
+                else {
+                    this.openEnds.push({
+                        last: [this.pos[0], this.pos[1]],
+                        pos: [this.pos[0]-2, this.pos[1]],
+                    });
+                }
+
+                // set right end if it is not already occupied else pop off openEnds
+                if (grid[this.pos[0]+2][this.pos[1]] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] + 2 && pos[1] == this.pos[1]
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+
+                    let nextPos = this.openEnds.pop();
+
+                    this.pos[0] = nextPos.pos[0];
+                    this.pos[1] = nextPos.pos[1];
+                    this.last[0] = nextPos.last[0];
+                    this.last[1] = nextPos.last[1];
+                }
+                else {
+                    this.last[0] = this.pos[0];
+                    this.last[1] = this.pos[1];
+                    this.pos[0] += 2;
+                }
+            }
+            // left is next
+            else {
+                // push left open end if it is not alredy occupied on the grid
+                if (grid[this.pos[0]+2][this.pos[1]] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] + 2 && pos[1] == this.pos[1]
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+                } 
+                else {
+                    this.openEnds.push({
+                        last: [this.pos[0], this.pos[1]],
+                        pos: [this.pos[0]+2, this.pos[1]],
+                    });
+                }
+
+                // set right end if it is not already occupied else pop off openEnds
+                if (grid[this.pos[0]-2][this.pos[1]] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] - 2 && pos[1] == this.pos[1]
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+
+                    let nextPos = this.openEnds.pop();
+
+                    this.pos[0] = nextPos.pos[0];
+                    this.pos[1] = nextPos.pos[1];
+                    this.last[0] = nextPos.last[0];
+                    this.last[1] = nextPos.last[1];
+                }
+                else {
+                    this.last[0] = this.pos[0];
+                    this.last[1] = this.pos[1];
+                    this.pos[0] -= 2;
+                }
+            }
+
+            grid[currPosX-2][currPosY] = 1;
+            grid[currPosX-1][currPosY] = 1;
+            grid[currPosX  ][currPosY] = 1;
+            grid[currPosX+1][currPosY] = 1;
+            grid[currPosX+2][currPosY] = 1;
+        }
+        else {
+            let currPosX = this.pos[0];
+            let currPosY = this.pos[1];
+
+            // bottom is next
+            if (this.last[0] < this.pos[0]) {
+                // push left open end if it is not alredy occupied on the grid
+                if (grid[this.pos[0]][this.pos[1]-2] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] && pos[1] == this.pos[1] - 2
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+                } 
+                else {
+                    this.openEnds.push({
+                        last: [this.pos[0], this.pos[1]],
+                        pos: [this.pos[0], this.pos[1]-2],
+                    });
+                }
+
+                // set right end if it is not already occupied else pop off openEnds
+                if (grid[this.pos[0]][this.pos[1]+2] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] && pos[1] == this.pos[1] + 2
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+
+                    let nextPos = this.openEnds.pop();
+
+                    this.pos[0] = nextPos.pos[0];
+                    this.pos[1] = nextPos.pos[1];
+                    this.last[0] = nextPos.last[0];
+                    this.last[1] = nextPos.last[1];
+                }
+                else {
+                    this.last[0] = this.pos[0];
+                    this.last[1] = this.pos[1];
+                    this.pos[1] += 2;
+                }
+            }
+            // top is next
+            else {
+                // push left open end if it is not alredy occupied on the grid
+                if (grid[this.pos[0]][this.pos[1]+2] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] && pos[1] == this.pos[1] + 2
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+                } 
+                else {
+                    this.openEnds.push({
+                        last: [this.pos[0], this.pos[1]],
+                        pos: [this.pos[0], this.pos[1]+2],
+                    });
+                }
+
+                // set right end if it is not already occupied else pop off openEnds
+                if (grid[this.pos[0]][this.pos[1]-2] == 1) {
+                    const index = this.openEnds.findIndex(pos =>
+                        pos[0] == this.pos[0] && pos[1] == this.pos[1] - 2
+                    );
+
+                    if (index !== -1) {
+                        this.openEnds.splice(index, 1);
+                    }
+
+                    let nextPos = this.openEnds.pop();
+
+                    this.pos[0] = nextPos.pos[0];
+                    this.pos[1] = nextPos.pos[1];
+                    this.last[0] = nextPos.last[0];
+                    this.last[1] = nextPos.last[1];
+                }
+                else {
+                    this.last[0] = this.pos[0];
+                    this.last[1] = this.pos[1];
+                    this.pos[1] -= 2;
+                }
+            }
+
+            grid[currPosX][currPosY-2] = 1;
+            grid[currPosX][currPosY-1] = 1;
+            grid[currPosX][currPosY  ] = 1;
+            grid[currPosX][currPosY+1] = 1;
+            grid[currPosX][currPosY+2] = 1;
+        }
+
+        this.up = !this.up;
+        console.log(this.pos, this.last);
+        return true
+    }
+}
+
+let grid = createGrid(GRID_WIDTH, GRID_HEIGHT);
+
+let startX = Math.floor(GRID_WIDTH/2);
+let startY = Math.floor(GRID_HEIGHT/2);
+
+let drawer = new Drawer(startX, startY, grid);
+
+while (drawer.step(grid)) {}
+
+drawGrid(grid);
+
+</script>
+</body>
+</html>
